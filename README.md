@@ -73,9 +73,12 @@ flowchart TD
     C --> G(E)
     C --> H(\+)
     C --> I(E)
-    G --> J(1)
-    I --> K(2)
-    F --> L(3)
+    G --> J(num)
+    I --> K(num)
+    F --> L(num)
+    J --> M[1]
+    K --> N[2]
+    L --> O[3]
 ```
 
 or
@@ -86,12 +89,15 @@ flowchart TD
     B --> C(E)
     B --> D(\+)
     B --> F(E)
-    C --> G(1)
+    C --> G(num)
     F --> H(E)
     F --> I(\+)
     F --> J(E)
-    H --> K(2)
-    J --> L(3)
+    G --> K[1]
+    H --> L(num)
+    J --> M(num)
+    L --> N[2]
+    M --> O[3]
 ```
 
 As we are working with addition (a binary operator), we can remove the ambiguity by treating one of the operands as a constant term $T$ as follows:
@@ -113,9 +119,13 @@ flowchart TD
     C --> G(E)
     C --> H(\+)
     C --> I(T)
-    G --> J(1)
-    I --> K(2)
-    F --> L(3)
+    G --> J(T)
+    I --> K(num)
+    F --> L(num)
+    J --> M(num)
+    M --> N[1]
+    L --> O[3]
+    K --> P[2]
 ```
 
 Then we have to remove left recursion from the grammar in the rule: $E\longrightarrow E + T | T$
@@ -134,12 +144,9 @@ $$A\prime \longrightarrow \alpha_1 A\prime |\alpha_2 A\prime | \dots |\epsilon$$
 > Aside: The Markdown latex code `$\alpha_1$` is being rendered like this:
 > $$\alpha_1$$,
 > 
-> with the 1 beside the alpha, instead with a 
-> so just keep in mind that it is supposed to be a subscript.
+> with the 1 beside the alpha instead of it being at a lower baseline, so just keep in mind that it is supposed to be a subscript.
 
-Applying this to the rule we identified
-
-Applying this to our grammar, the new grammar becomes:
+Applying this to our grammar (specifically the rule we identified above), the new grammar becomes:
 
 $$P \longrightarrow E$$
 $$E \longrightarrow T$$
