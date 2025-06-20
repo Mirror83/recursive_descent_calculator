@@ -6,18 +6,18 @@ pub enum Token {
     RBracket,
     Plus,
     Num(u32),
+    // Represents end of input
+    EOF,
 }
 
 #[derive(Debug, PartialEq)]
 pub enum TokenizerError {
-    NoInput,
     UnexpectedCharacter(char),
 }
 
 impl fmt::Display for TokenizerError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::NoInput => write!(f, "Cannot retrieve token from empty string"),
             Self::UnexpectedCharacter(val) => write!(f, "Unexpected character {val}"),
         }
     }
@@ -26,10 +26,6 @@ impl fmt::Display for TokenizerError {
 impl Error for TokenizerError {}
 
 pub fn tokenize(input: &str) -> Result<Vec<Token>, TokenizerError> {
-    if input.len() == 0 {
-        return Err(TokenizerError::NoInput);
-    }
-
     let mut token_list: Vec<Token> = Vec::new();
 
     for character in input.chars() {
@@ -47,6 +43,8 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, TokenizerError> {
             _ => return Err(TokenizerError::UnexpectedCharacter(character)),
         }
     }
+
+    token_list.push(Token::EOF);
     return Ok(token_list);
 }
 
@@ -56,12 +54,12 @@ mod tests {
 
     #[test]
     fn empty_string() {
-        assert_eq!(tokenize("").err(), Some(TokenizerError::NoInput));
+        assert_eq!(tokenize("").unwrap(), vec![Token::EOF]);
     }
 
     #[test]
     fn single_number() {
-        assert_eq!(tokenize("2").unwrap(), vec![Token::Num(2)])
+        assert_eq!(tokenize("2").unwrap(), vec![Token::Num(2), Token::EOF])
     }
 
     #[test]
@@ -74,6 +72,7 @@ mod tests {
                 Token::Plus,
                 Token::Num(2),
                 Token::RBracket,
+                Token::EOF
             ]
         )
     }
@@ -88,13 +87,17 @@ mod tests {
                 Token::Plus,
                 Token::Num(2),
                 Token::RBracket,
+                Token::EOF
             ]
         )
     }
 
     #[test]
     fn simple_invalid_arithmetic_with_correct_tokens() {
-        assert_eq!(tokenize("3+").unwrap(), vec![Token::Num(3), Token::Plus])
+        assert_eq!(
+            tokenize("3+").unwrap(),
+            vec![Token::Num(3), Token::Plus, Token::EOF]
+        )
     }
 
     #[test]

@@ -6,6 +6,7 @@ use crate::tokenizer::Token;
 pub enum ParseError {
     GenericError,
     NoInput,
+    InvalidTokenArray,
 }
 
 impl fmt::Display for ParseError {
@@ -25,6 +26,8 @@ impl Parser {
     /// Creates a new parser given a list of tokens
     pub fn new(tokens: Vec<Token>) -> Result<Parser, ParseError> {
         if tokens.len() == 0 {
+            Err(ParseError::InvalidTokenArray)
+        } else if tokens.len() == 1 && tokens[0] == Token::EOF {
             Err(ParseError::NoInput)
         } else {
             Ok(Parser {
@@ -39,7 +42,12 @@ impl Parser {
     /// if the original expression was malformed.
     /// Corresponds to the `P -> E` production in the grammar.
     pub fn parse(&mut self) -> Result<u32, ParseError> {
-        return self.parse_e();
+        let result = self.parse_e()?;
+        if self.expect_token(Token::EOF) {
+            Ok(result)
+        } else {
+            Err(ParseError::GenericError)
+        }
     }
 
     /// Corresponds to the `E -> TE'` production in the grammar.
@@ -132,18 +140,30 @@ mod tests {
 
     #[test]
     fn empty_token_list() {
-        assert_eq!(Parser::new(vec![]).err(), Some(ParseError::NoInput));
+        assert_eq!(
+            Parser::new(vec![]).err(),
+            Some(ParseError::InvalidTokenArray)
+        );
+    }
+
+    #[test]
+    fn token_list_with_just_eof() {
+        assert_eq!(
+            Parser::new(vec![]).err(),
+            Some(ParseError::InvalidTokenArray)
+        )
     }
 
     #[test]
     fn token_list_with_single_num() {
-        let mut parser = Parser::new(vec![Token::Num(2)]).unwrap();
+        let mut parser = Parser::new(vec![Token::Num(2), Token::EOF]).unwrap();
         assert_eq!(parser.parse().unwrap(), 2);
     }
 
     #[test]
     fn token_list_with_simple_sum() {
-        let mut parser = Parser::new(vec![Token::Num(2), Token::Plus, Token::Num(2)]).unwrap();
+        let mut parser =
+            Parser::new(vec![Token::Num(2), Token::Plus, Token::Num(2), Token::EOF]).unwrap();
         assert_eq!(parser.parse().unwrap(), 4)
     }
 
@@ -155,6 +175,7 @@ mod tests {
             Token::Plus,
             Token::Num(2),
             Token::RBracket,
+            Token::EOF,
         ])
         .unwrap();
         assert_eq!(parser.parse().unwrap(), 4)
