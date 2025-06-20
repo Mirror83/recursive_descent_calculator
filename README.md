@@ -1,7 +1,9 @@
 # Recursive Descent Calculator
 
-A simple calculator that can be used to perform parenthesised
-positive integer addition (for now), created using recursive descent. The motivation behind this is to build a small project to test my Rust knowledge, as I have been learning the language for some time now.
+A simple calculator that can be used to perform parenthesised, single-digit,
+positive integer addition (for now), created using recursive descent parser to such arithmetic expressions.
+The motivation behind this was to build a small project to test my Rust knowledge,
+as I have been learning the language for some time now.
 
 Recursive descent is an approach to writing a parser where there's a simple for function for each non-terminal in the grammar. The body of the function follows the right-hand sides of the corresponding rules: non-terminals result in a call to another parse function, while terminals result in considering the next token.
 
@@ -111,3 +113,9 @@ $$T \longrightarrow (E)$$
 $$T \longrightarrow num$$
 
 The grammar is now suitable for recursive descent parsing (more formally, it is an LL(1) grammar).
+
+## Next steps
+
+These are some improvements that I may or may not get working on:
+
+- Handle overflow
