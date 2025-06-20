@@ -45,6 +45,7 @@ The tokens that will be accepted include:
 ## Grammar
 
 The grammar that the parser is implementing is as follows:
+
 $$P \longrightarrow E$$
 $$E \longrightarrow (E)$$
 $$E \longrightarrow E + E$$
@@ -94,6 +95,7 @@ flowchart TD
 ```
 
 As we are working with addition (a binary operator), we can remove the ambiguity by treating one of the operands as a constant term $T$ as follows:
+
 $$P \longrightarrow E$$
 $$E \longrightarrow E + T$$
 $$E \longrightarrow T$$
@@ -116,23 +118,33 @@ flowchart TD
     F --> L(3)
 ```
 
-Then we have to remove left recursion from the grammar in the rule $E\longrightarrow E + T\space|\space T$
+Then we have to remove left recursion from the grammar in the rule: $E\longrightarrow E + T | T$
 
 **N/B**: _Left recursion_ is a situation where we have a rule where the right-hand side starts with the symbol in the left-hand side.
 
 If you have a rule of the following form:
-$$ A \longrightarrow A\alpha_1|A\alpha_2|\dots|\beta_1|\beta_2|\dots$$
+
+$$ A \longrightarrow A \alpha_1 | A\alpha_2 | \dots | \beta_1 | \beta_2 |\dots$$
+
 the left recursion can be removed by replacing it with the following sets of rules:
-$$A \longrightarrow \beta_1A'|\beta_2A'|\dots$$
-$$A' \longrightarrow \alpha_1A'|\alpha_2A'|\dots|\epsilon$$
+
+$$A \longrightarrow \beta_1 A\prime | \beta_2A\prime|\dots$$
+$$A\prime \longrightarrow \alpha_1 A\prime |\alpha_2 A\prime | \dots |\epsilon$$
+
+> Aside: The Markdown latex code `$\alpha_1$` is being rendered like this:
+> $$\alpha_1$$,
+> 
+> with the 1 beside the alpha, instead with a 
+> so just keep in mind that it is supposed to be a subscript.
 
 Applying this to the rule we identified
 
 Applying this to our grammar, the new grammar becomes:
+
 $$P \longrightarrow E$$
 $$E \longrightarrow T$$
-$$E \longrightarrow TE'$$
-$$E' \longrightarrow +TE' \space | \space \epsilon$$
+$$E \longrightarrow TE\prime $$
+$$E\prime \longrightarrow +TE\prime | \epsilon$$
 $$T \longrightarrow (E)$$
 $$T \longrightarrow num$$
 
