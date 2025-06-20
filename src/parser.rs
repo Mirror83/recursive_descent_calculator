@@ -1,17 +1,28 @@
-use std::{error::Error, fmt};
+use std::{
+    error::Error,
+    fmt::{self},
+};
 
 use crate::tokenizer::Token;
 
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
-    GenericError,
+    UnmatchedBracket,
+    UnexpectedToken(Token),
     NoInput,
-    InvalidTokenArray,
+    EmptyTokenArray,
 }
 
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Unable to parse input.")
+        match self {
+            Self::NoInput => write!(f, "No expression provided"),
+            Self::UnmatchedBracket => write!(f, "Syntax error: Unmatched closing bracket"),
+            Self::UnexpectedToken(token) => write!(f, "Syntax error: unexpected token `{token:?}`"),
+            // N/B: This last error will indicate an issue in the tokenizer.
+            // In practice, this should not be shown to the user of the command-line application
+            Self::EmptyTokenArray => write!(f, "Token array should at least have an EOF token"),
+        }
     }
 }
 
@@ -26,7 +37,7 @@ impl Parser {
     /// Creates a new parser given a list of tokens
     pub fn new(tokens: Vec<Token>) -> Result<Parser, ParseError> {
         if tokens.len() == 0 {
-            Err(ParseError::InvalidTokenArray)
+            Err(ParseError::EmptyTokenArray)
         } else if tokens.len() == 1 && tokens[0] == Token::EOF {
             Err(ParseError::NoInput)
         } else {
@@ -46,7 +57,7 @@ impl Parser {
         if self.expect_token(Token::EOF) {
             Ok(result)
         } else {
-            Err(ParseError::GenericError)
+            Err(ParseError::UnexpectedToken(self.current_token()))
         }
     }
 
@@ -91,13 +102,13 @@ impl Parser {
             Token::LBracket => {
                 let inner_expression_result = self.parse_e()?;
                 if !self.expect_token(Token::RBracket) {
-                    Err(ParseError::GenericError)
+                    Err(ParseError::UnmatchedBracket)
                 } else {
                     Ok(inner_expression_result)
                 }
             }
             Token::Num(val) => Ok(val),
-            _ => Err(ParseError::GenericError),
+            _ => Err(ParseError::UnexpectedToken(token)),
         }
     }
 
@@ -140,18 +151,12 @@ mod tests {
 
     #[test]
     fn empty_token_list() {
-        assert_eq!(
-            Parser::new(vec![]).err(),
-            Some(ParseError::InvalidTokenArray)
-        );
+        assert_eq!(Parser::new(vec![]).err(), Some(ParseError::EmptyTokenArray));
     }
 
     #[test]
     fn token_list_with_just_eof() {
-        assert_eq!(
-            Parser::new(vec![]).err(),
-            Some(ParseError::InvalidTokenArray)
-        )
+        assert_eq!(Parser::new(vec![]).err(), Some(ParseError::EmptyTokenArray))
     }
 
     #[test]
