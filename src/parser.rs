@@ -39,12 +39,16 @@ impl Parser {
     /// if the original expression was malformed.
     /// Corresponds to the `P -> E` production in the grammar.
     pub fn parse(&self) -> Result<u32, ParseError> {
-        Ok(1)
+        return self.parse_e();
     }
 
     /// Corresponds to the `E -> TE'` production in the grammar.
     fn parse_e(&self) -> Result<u32, ParseError> {
-        Ok(1)
+        let t_result = self.parse_t()?;
+        match self.parse_e_prime()? {
+            Some(e_prime_result) => Ok(t_result + e_prime_result),
+            None => Ok(t_result), // i.e e_prime produced an ϵ
+        }
     }
 
     /// Corresponds to the `E' -> +TE' | ϵ` production in the grammar.
