@@ -3,7 +3,10 @@ mod tokenizer;
 
 use crate::parser::Parser;
 use crate::tokenizer::tokenize;
-use std::io::{self, Write};
+use std::{
+    error::Error,
+    io::{self, Write},
+};
 
 pub fn run() {
     loop {
@@ -13,9 +16,20 @@ pub fn run() {
         io::stdin()
             .read_line(&mut input)
             .expect("Unable to read line");
-        let tokens = tokenize(input.trim()).unwrap();
-        let mut parser = Parser::new(tokens).unwrap();
-        let result = parser.parse().unwrap();
-        println!("{result}");
+
+        match process_user_input(&input) {
+            Ok(result) => {
+                println!("{result}")
+            }
+            Err(err) => {
+                eprintln!("{}", err.to_string())
+            }
+        }
     }
+}
+
+fn process_user_input(input: &str) -> Result<u32, Box<dyn Error>> {
+    let tokens = tokenize(input.trim())?;
+    let mut parser = Parser::new(tokens)?;
+    Ok(parser.parse()?)
 }
