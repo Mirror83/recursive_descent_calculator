@@ -47,9 +47,29 @@ impl Parser {
         Ok(1)
     }
 
-    /// Corresponds to the `E' -> +TE | ϵ` production in the grammar.
-    fn parse_e_prime(&self) -> Result<u32, ParseError> {
-        Ok(1)
+    /// Corresponds to the `E' -> +TE' | ϵ` production in the grammar.
+    /// Since this rule can produce `ϵ`, the method returns a `Result`
+    /// with an `Option `instead of just a value like the other parse_* methods.
+    /// The Option values will be `None` if `ϵ` is produced and returns
+    /// a `Some` that contains the value of evaluating `+TE` otherwise
+    fn parse_e_prime(&self) -> Result<Option<u32>, ParseError> {
+        let token = self.next_token();
+        match token {
+            Token::Plus => {
+                let t_result = self.parse_t()?;
+                let next_e_prime_result = self.parse_e_prime()?;
+                match next_e_prime_result {
+                    Some(val) => Ok(Some(val + t_result)),
+                    None => Ok(Some(t_result)),
+                }
+            }
+            _ => {
+                // The token will be considered by some other rule.
+                // Essentially we have produced an ϵ
+                self.put_back_token(token);
+                return Ok(None);
+            }
+        }
     }
 
     /// Corresponds to the `T -> (E) | num` production in the grammar.
@@ -82,7 +102,7 @@ impl Parser {
 
     /// Puts an unexpected token [t] back for consideration. That token
     /// will be returned again by the next call to `next_token`
-    fn putback_token(&self, t: Token) {}
+    fn put_back_token(&self, t: Token) {}
 }
 
 #[cfg(test)]
