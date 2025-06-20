@@ -9,7 +9,29 @@ as I have been learning the language for some time now.
 
 Recursive descent is an approach to writing a parser where there's a simple for function for each non-terminal in the grammar. The body of the function follows the right-hand sides of the corresponding rules: non-terminals result in a call to another parse function, while terminals result in considering the next token.
 
-This definition is from the second edition of Introduction to Compilers and Language Design by Prof. Douglas Thain. (p.g 45) which I referenced while both doing the [original assignment](https://github.com/Mirror83/compiler-construction-assignments) which I did in C, and making this remake. I recommend it if you're interested in Compiler Construction, or would like more details on the concepts I kind of gloss over here.
+This definition is from the second edition of Introduction to Compilers and Language Design by Prof. Douglas Thain. (p.g 45) which I referenced while both doing the [original assignment](https://github.com/Mirror83/compiler-construction-assignments) which I did in C, and making this remake. I recommend it if you're interested in Compiler Construction, or would like more details on the concepts I gloss over here.
+
+## Structure
+
+The following are the files in `src/`
+
+- `tokenizer.rs` - Implements a hand-written tokenizer (not regex based) to retrieve tokens from user input
+- `parser.rs` - Implements the recursive descent parser, which acts as an interpreter as well as it computes the
+  value of the expression represented by the list of tokens it receives from the tokenizer.
+- `lib.rs` - Calls the logic in the previous two files and implements logic for retrieving input from the user
+  and showing output to them
+- `main.rs` - Prints the header, and calls the logic in `lib.rs`
+
+## How to run
+
+- Run tests and ensure they pass
+  ```
+  cargo test
+  ```
+- Run the project
+  ```
+  cargo run
+  ```
 
 ## Tokens
 
