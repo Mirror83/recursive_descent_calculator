@@ -15,12 +15,12 @@ This definition is from the second edition of Introduction to Compilers and Lang
 
 The following are the files in `src/`
 
-- `tokenizer.rs` - Implements a hand-written tokenizer (not regex based) to retrieve tokens from user input
-- `parser.rs` - Implements the recursive descent parser, which acts as an interpreter as well as it computes the
+- [`tokenizer.rs`](src/tokenizer.rs) - Implements a hand-written tokenizer (not regex based) to retrieve tokens from user input
+- [`parser.rs`](src/parser.rs) - Implements the recursive descent parser, which acts as an interpreter as well as it computes the
   value of the expression represented by the list of tokens it receives from the tokenizer.
-- `lib.rs` - Calls the logic in the previous two files and implements logic for retrieving input from the user
+- [`lib.rs`](src/lib.rs) - Calls the logic in the previous two files and implements logic for retrieving input from the user
   and showing output to them
-- `main.rs` - Prints the header, and calls the logic in `lib.rs`
+- [`main.rs`](src/main.rs) - Prints the header, and calls the logic in `lib.rs`
 
 ## How to run
 
