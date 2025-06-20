@@ -9,7 +9,7 @@ as I have been learning the language for some time now.
 
 Recursive descent is an approach to writing a parser where there's a simple for function for each non-terminal in the grammar. The body of the function follows the right-hand sides of the corresponding rules: non-terminals result in a call to another parse function, while terminals result in considering the next token.
 
-This definition is from the second edition of Introduction to Compilers and Language Design by Prof. Douglas Thain. (p.g 45) which I referenced while both doing the [original assignment](https://github.com/Mirror83/compiler-construction-assignments) which I did in C, and making this remake. I recommend it if you're interested in Compiler Construction, or would like more details on the concepts I gloss over here.
+This definition is from the second edition of Introduction to Compilers and Language Design by Prof. Douglas Thain. (p.g 45) which I referenced while both doing the [original assignment](https://github.com/Mirror83/compiler_construction_assignments) which I did in C, and making this remake. I recommend it if you're interested in Compiler Construction, or would like more details on the concepts I gloss over here.
 
 ## Structure
 
