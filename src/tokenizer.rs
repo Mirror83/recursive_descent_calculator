@@ -1,6 +1,6 @@
 use std::{error::Error, fmt};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Token {
     LBracket,
     RBracket,

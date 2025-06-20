@@ -14,7 +14,7 @@ pub fn run() {
             .read_line(&mut input)
             .expect("Unable to read line");
         let tokens = tokenize(input.trim()).unwrap();
-        let parser = Parser::new(tokens).unwrap();
+        let mut parser = Parser::new(tokens).unwrap();
         let result = parser.parse().unwrap();
         println!("{result}");
     }

@@ -38,12 +38,12 @@ impl Parser {
     /// and returns the result of that expression, or an error
     /// if the original expression was malformed.
     /// Corresponds to the `P -> E` production in the grammar.
-    pub fn parse(&self) -> Result<u32, ParseError> {
+    pub fn parse(&mut self) -> Result<u32, ParseError> {
         return self.parse_e();
     }
 
     /// Corresponds to the `E -> TE'` production in the grammar.
-    fn parse_e(&self) -> Result<u32, ParseError> {
+    fn parse_e(&mut self) -> Result<u32, ParseError> {
         let t_result = self.parse_t()?;
         match self.parse_e_prime()? {
             Some(e_prime_result) => Ok(t_result + e_prime_result),
@@ -56,8 +56,8 @@ impl Parser {
     /// with an `Option `instead of just a value like the other parse_* methods.
     /// The Option values will be `None` if `ϵ` is produced and returns
     /// a `Some` that contains the value of evaluating `+TE` otherwise
-    fn parse_e_prime(&self) -> Result<Option<u32>, ParseError> {
-        let token = self.next_token();
+    fn parse_e_prime(&mut self) -> Result<Option<u32>, ParseError> {
+        let token = self.current_token();
         match token {
             Token::Plus => {
                 let t_result = self.parse_t()?;
@@ -70,15 +70,15 @@ impl Parser {
             _ => {
                 // The token will be considered by some other rule.
                 // Essentially we have produced an ϵ
-                self.put_back_token(token);
+                self.put_back_token();
                 return Ok(None);
             }
         }
     }
 
     /// Corresponds to the `T -> (E) | num` production in the grammar.
-    fn parse_t(&self) -> Result<u32, ParseError> {
-        let token = self.next_token();
+    fn parse_t(&mut self) -> Result<u32, ParseError> {
+        let token = self.current_token();
         match token {
             Token::LBracket => {
                 let inner_expression_result = self.parse_e()?;
@@ -93,20 +93,37 @@ impl Parser {
         }
     }
 
-    /// Returns the next token to be considered
-    fn next_token(&self) -> Token {
-        Token::Num(1)
+    /// Returns the token to be considered
+    fn current_token(&mut self) -> Token {
+        if self.current_token_index >= self.tokens.len() {
+            panic!("No more tokens!");
+        }
+        let token = self.tokens[self.current_token_index].clone();
+        self.current_token_index += 1;
+        return token;
     }
 
-    /// Returns `true` if [t] is the same as the next token
-    /// and false otherwise
-    fn expect_token(&self, t: Token) -> bool {
-        return false;
+    /// Returns `true` if [t] is the same as the current token
+    /// to be considered and `false` otherwise
+    fn expect_token(&mut self, t: Token) -> bool {
+        let token = self.current_token();
+        let result = token == t;
+        if !result {
+            self.put_back_token();
+        }
+
+        return result;
     }
 
     /// Puts an unexpected token [t] back for consideration. That token
-    /// will be returned again by the next call to `next_token`
-    fn put_back_token(&self, t: Token) {}
+    /// will be returned again by the next call to `current_token`
+    fn put_back_token(&mut self) {
+        if self.current_token_index > 0 {
+            self.current_token_index -= 1
+        } else {
+            panic!("Unexpected call to `put_back_token`. Token index cannot be negative.")
+        }
+    }
 }
 
 #[cfg(test)]
@@ -120,19 +137,19 @@ mod tests {
 
     #[test]
     fn token_list_with_single_num() {
-        let parser = Parser::new(vec![Token::Num(2)]).unwrap();
+        let mut parser = Parser::new(vec![Token::Num(2)]).unwrap();
         assert_eq!(parser.parse().unwrap(), 2);
     }
 
     #[test]
     fn token_list_with_simple_sum() {
-        let parser = Parser::new(vec![Token::Num(2), Token::Plus, Token::Num(2)]).unwrap();
+        let mut parser = Parser::new(vec![Token::Num(2), Token::Plus, Token::Num(2)]).unwrap();
         assert_eq!(parser.parse().unwrap(), 4)
     }
 
     #[test]
     fn token_list_with_simple_parenthesised_sum() {
-        let parser = Parser::new(vec![
+        let mut parser = Parser::new(vec![
             Token::LBracket,
             Token::Num(2),
             Token::Plus,
